@@ -1,236 +1,281 @@
-Nyaya-Setu ⚖️
-A Cognitive Compliance Engine for Transforming Court Judgments into Verified Government Action Plans
-📌 Overview
+# ⚖️ Nyaya-Setu  
+### *From Court Judgments to Verified Government Action Plans*
 
-Nyaya-Setu is an AI-powered middleware platform designed to bridge the critical gap between judicial decisions and administrative execution.
+![Status](https://img.shields.io/badge/status-active-success)
+![AI](https://img.shields.io/badge/AI-LLM%20Powered-blue)
+![Backend](https://img.shields.io/badge/backend-FastAPI-green)
+![Frontend](https://img.shields.io/badge/frontend-React-blueviolet)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
+![Hackathon](https://img.shields.io/badge/hackathon-ready-orange)
 
-Government departments routinely receive court judgments as unstructured PDFs via systems like the Court Case Monitoring System (CCMS). These documents contain legally binding directives, but extracting actionable insights requires extensive manual effort, leading to:
+---
 
-Delays in decision-making
-Missed legal deadlines
-Increased risk of contempt proceedings
-Lack of accountability and traceability
+## 🧠 What is Nyaya-Setu?
 
-Nyaya-Setu transforms this workflow by converting complex legal documents into structured, explainable, and human-verified action plans.
+Nyaya-Setu is a **Cognitive Compliance Engine** that transforms unstructured court judgment PDFs into:
 
-🚨 Problem Statement
+- ✔ Structured data  
+- ✔ AI-generated action plans  
+- ✔ Human-verified decisions  
+- ✔ Execution-ready dashboards  
 
-Court judgments are:
+> It bridges the gap between **judicial intent and administrative action**.
 
-Lengthy and complex
-Written in dense legal language
-Delivered as unstructured PDFs
+---
 
-Officials must manually:
+## 📸 System Overview
 
-Read entire documents
-Identify key directives
-Decide whether to comply or appeal
-Track deadlines and responsibilities
+![Architecture](https://drive.google.com/file/d/1Q-JLFioncdRHqEl-lfO-H12vA6CgWFoR/view?usp=drive_link)
 
-This process is:
+---
 
-Time-consuming
-Error-prone
-Inconsistent across departments
+## 🚨 The Core Problem
 
-There is currently no system that interprets judicial intent and converts it into decision-ready administrative workflows.
+Government systems like CCMS:
+- Store judgments as PDFs  
+- Do **not interpret or operationalize them**
 
-💡 Solution: Nyaya-Setu
+This leads to:
+- ⏱ Delays in execution  
+- ❌ Missed deadlines  
+- ⚖️ Contempt risks  
+- 🔍 No accountability  
 
-Nyaya-Setu is not just a document processing tool—it is a Cognitive Compliance Engine.
+---
 
-It:
+## 💡 Our Breakthrough
 
-Understands court judgments
-Extracts actionable directives
-Generates structured action plans
-Ensures human verification
-Tracks execution accountability
-✨ Key Features
-1. Intelligent Document Processing
-Handles both scanned and digital PDFs
-Uses OCR + NLP pipelines
-Preserves document structure and context
-2. Judicial Intent Understanding (Core Innovation)
+> Nyaya-Setu doesn’t just read judgments—it **understands, decides, and tracks execution**.
 
-Unlike traditional systems that only extract text, Nyaya-Setu:
+---
 
-Identifies intent behind court orders
-Classifies directives as:
-Mandatory compliance
-Advisory
-Conditional
-Appeal-worthy
-3. AI-Powered Action Plan Generation
+## ✨ Key Features
 
-Automatically converts legal text into structured tasks:
+### 🔍 1. Intelligent Extraction
+- OCR + LLM pipeline  
+- Extracts:
+  - Case details  
+  - Directives  
+  - Timelines  
 
+---
+
+### ⚖️ 2. Judicial Intent Engine (Core Innovation)
+- Classifies:
+  - Mandatory compliance  
+  - Advisory  
+  - Conditional  
+  - Appeal-worthy  
+
+👉 Moves from **text parsing → legal reasoning**
+
+---
+
+### 🧾 3. Action Plan Generator
+
+```json
 {
-  "action_type": "File Appeal",
+  "action": "File Appeal",
   "deadline": "30 days",
-  "department": "Revenue Department",
-  "priority": "High",
-  "justification": "Adverse ruling"
+  "department": "Revenue",
+  "priority": "High"
 }
-4. Deadline Intelligence
-Extracts explicit deadlines
-Infers implicit legal timelines (e.g., appeal limitation periods)
-Flags urgency and risk
-5. Explainable AI (Trust Layer)
+```
 
+## ⏳ 4. Deadline Intelligence
+- Extracts explicit timelines  
+- Infers implicit ones (legal rules)  
+
+---
+
+## 🔎 5. Explainable AI
 Every output includes:
+- Source reference (PDF highlight)  
+- Confidence score  
+- Reasoning  
 
-Source text references (page + paragraph)
-Confidence scores
-Reasoning
+---
 
-Ensures transparency and auditability for government use
+## 👨‍⚖️ 6. Human-in-the-Loop (Mandatory)
+- Approve / Edit / Reject  
+- Only verified data moves forward  
 
-6. Human-in-the-Loop Verification (Mandatory Layer)
+---
 
-Before any action is finalized:
+## 📊 7. Decision Dashboard
+- Department-wise actions  
+- Deadline alerts  
+- Clean actionable interface  
 
-Legal officers review AI outputs
-Can approve, edit, or reject
-Only verified data is used
-7. Accountability & Audit Trail
-Tracks:
-Who reviewed
-What was changed
-When actions were approved
-Enables traceable governance
-8. Multilingual Simplification
-Generates Kannada summaries
-Converts legal language into actionable instructions for field officers
-9. Decision Dashboard
-Clean, minimal interface
-Displays only verified action plans
-Department-wise filtering
-Deadline alerts
-🏗️ System Architecture
-PDF Input
+---
+
+## 🌐 8. Multilingual Execution
+- Kannada summaries  
+- Field-level clarity  
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TD
+    A[Upload PDF] --> B[OCR Processing]
+    B --> C[Text Structuring]
+    C --> D[Directive Extraction]
+    D --> E[Intent Classification]
+    E --> F[Action Plan Generation]
+    F --> G[Human Verification]
+    G --> H[Dashboard]
+```
+---
+
+## ⚙️ Tech Stack
+
+| Layer      | Technology                         |
+|------------|----------------------------------|
+| AI/LLM     | GPT-4o / Llama-3                 |
+| OCR        | Tesseract / Azure Form Recognizer|
+| Backend    | FastAPI                          |
+| Frontend   | React + Tailwind                 |
+| Database   | PostgreSQL                       |
+| Storage    | AWS S3 / Azure Blob              |
+
+---
+
+## 🔄 Workflow
+
+```text
+Upload PDF
    ↓
-OCR Engine (Tesseract / Azure)
+Extract Text (OCR)
    ↓
-Text Structuring Layer
+Identify Legal Directives
    ↓
-LLM Extraction Engine
+Classify Intent
    ↓
-Judicial Intent Classifier
+Generate Action Plan
    ↓
-Action Plan Generator
+Human Verification
    ↓
-Explainability Layer
-   ↓
-Human Verification (HITL)
-   ↓
-Dashboard & API Output
-⚙️ Tech Stack
-AI / NLP
-GPT-4o / Llama-3 (legal-domain prompting)
-LangChain (optional orchestration)
-OCR
-Tesseract OCR
-Azure Form Recognizer
-Backend
-FastAPI (Python)
-Database
-PostgreSQL (audit logs, actions, versioning)
-Frontend
-React + Tailwind CSS
-Storage
-AWS S3 / Azure Blob Storage
-🔄 Workflow
-Step 1: Upload
-Court judgment PDF is uploaded or fetched via API
-Step 2: Extraction
-Text + structure extracted using OCR + LLM
-Step 3: Interpretation
-AI identifies directives, intent, and timelines
-Step 4: Action Plan Generation
-Converts legal content → structured tasks
-Step 5: Verification
-Human reviewer validates AI output
-Step 6: Dashboard
-Approved actions displayed for execution
-📊 Sample Output
+Dashboard Output
+```
+
+---
+
+## 📊 Sample Transformation
+
+### 📥 Input (Judgment)
+> “Respondents are directed to regularize land within 8 weeks.”
+
+### 📤 Output
+```json
 {
-  "case_id": "WP 1234/2024",
   "intent": "Mandatory Compliance",
-  "actions": [
-    {
-      "description": "Regularize land ownership",
-      "deadline": "56 days",
-      "responsible_officer": "Tehsildar",
-      "priority": "High",
-      "confidence": 0.92
-    }
-  ]
+  "action": "Regularize land",
+  "deadline": "56 days",
+  "officer": "Tehsildar",
+  "priority": "High"
 }
-🧪 Evaluation Alignment
-Criteria	How Nyaya-Setu Addresses It
-Accuracy	LLM + OCR hybrid with confidence scoring
-Action Plan Quality	Structured, decision-ready outputs
-Human Verification	Mandatory HITL layer
-Dashboard Usability	Clean, minimal, decision-focused UI
-🚀 Deployment
-1. Clone Repository
-git clone https://github.com/your-repo/nyaya-setu.git
-cd nyaya-setu
-2. Backend Setup
+```
+
+---
+
+## 🧪 Evaluation Fit
+
+| Criteria                | Coverage                          |
+|------------------------|----------------------------------|
+| Extraction Accuracy    | OCR + LLM + confidence           |
+| Action Plan Quality    | Structured + decision-ready      |
+| HITL Effectiveness     | Mandatory validation layer       |
+| Dashboard Usability    | Clean + actionable               |
+
+---
+
+## 🚀 Getting Started
+
+### 🔧 Backend
+```bash
 pip install -r requirements.txt
 uvicorn main:app --reload
-3. Frontend Setup
+```
+### 💻 Frontend
+
+```bash
 cd frontend
 npm install
 npm run dev
-4. Environment Variables
+```
+---
 
-Create .env:
+## 🔐 Environment Setup
 
+Create a `.env` file:
+
+```env
 OPENAI_API_KEY=your_key
 DATABASE_URL=postgresql://user:password@localhost/db
-🛡️ Non-Functional Requirements
-High accuracy (>85%)
-Low latency (<10 seconds processing)
-Secure (role-based access)
-Fully auditable system
-⚠️ Challenges Addressed
-Handling inconsistent legal document formats
-Extracting implicit meaning (not just explicit text)
-Ensuring explainability in AI decisions
-Balancing automation with human oversight
-🌟 Novelty
+```
 
-Nyaya-Setu introduces:
+---
 
-Judicial intent understanding
-AI-assisted administrative decision-making
-Accountability graph for governance
-Explainable legal AI workflows
+## 🛡️ System Guarantees
 
-Unlike existing systems, it focuses on post-judgment execution, not just case tracking
+- ✅ Explainable outputs  
+- ✅ Human-verified data only  
+- ✅ Full audit trail  
+- ✅ Scalable architecture  
 
-📈 Impact
-⏱️ 80% reduction in manual review time
-⚖️ Reduced contempt of court risks
-📊 Improved administrative efficiency
-🔍 Full transparency and traceability
-🔮 Future Enhancements
-Contempt risk prediction model
-Appeal success probability scoring
-Integration with government workflow systems
-Historical case similarity engine
-🤝 Contributing
+---
 
-Contributions are welcome!
-Please open issues or submit pull requests for improvements.
+## 🌟 Why This is Unique
 
-📜 License
+| Existing Systems     | Nyaya-Setu              |
+|---------------------|------------------------|
+| Store PDFs          | Understand intent      |
+| Manual reading      | Automated reasoning    |
+| No decision support | AI-generated actions   |
+| No accountability   | Full audit tracking    |
 
-MIT License
+---
 
-🏁 Final Note
+## 📈 Impact
 
-Nyaya-Setu is a step toward AI-assisted governance, where judicial decisions are not just recorded—but understood, verified, and executed with accountability.
+- ⏱ 80% faster processing  
+- ⚖️ Reduced contempt risks  
+- 🧑‍💼 Better governance efficiency  
+- 🔍 Transparent decision-making  
+
+---
+
+## 🔮 Future Roadmap
+
+- 📊 Contempt Risk Prediction  
+- 📈 Appeal Success Scoring  
+- 🔎 Case Similarity Search  
+- 🏛 Government API Integration  
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome!  
+Let’s build **AI-powered governance together**.
+
+---
+
+## 📜 License
+
+MIT License  
+
+---
+
+## 🏁 Final Thought
+
+> Nyaya-Setu is not just automation.  
+> It is a step toward **intelligent, accountable, AI-assisted governance**.
+
+---
+
+## ⭐ Support
+
+If you like this project, consider giving it a ⭐ on GitHub!
