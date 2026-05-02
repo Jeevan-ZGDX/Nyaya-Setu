@@ -1,42 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-[#F8FAFC] text-slate-900 font-sans antialiased;
-  }
+  html { font-family: 'Inter', sans-serif; }
+  body { @apply bg-slate-50 text-slate-900 antialiased; }
 }
 
 @layer components {
-  .glass-panel {
-    @apply bg-white/80 backdrop-blur-md border border-slate-200/50 shadow-sm;
-  }
-  
-  .premium-card {
-    @apply bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300;
-  }
-  
-  .status-badge {
-    @apply px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase;
-  }
+  .card { @apply bg-white rounded-2xl border border-slate-200 shadow-sm; }
+  .btn-primary { @apply px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-blue-500/20 disabled:opacity-50 disabled:pointer-events-none; }
+  .btn-ghost { @apply px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-medium transition-all shadow-sm; }
+  .badge { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide; }
+  .input { @apply w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all; }
+  .page { @apply p-8 max-w-7xl mx-auto space-y-8; }
+  .page-header { @apply flex flex-col md:flex-row md:items-center justify-between gap-4; }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-slate-100;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full hover:bg-slate-400;
-}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { @apply bg-slate-100; }
+::-webkit-scrollbar-thumb { @apply bg-slate-300 rounded-full; }
 
-.pdf-viewer-placeholder {
-  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-  background-size: 20px 20px;
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
 }

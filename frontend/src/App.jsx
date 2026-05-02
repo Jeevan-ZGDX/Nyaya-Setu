@@ -1,122 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Scale, LayoutDashboard, Upload, ListChecks, BookOpen } from 'lucide-react';
+import UploadPage from './pages/Upload';
+import Dashboard from './pages/Dashboard';
+import ReviewPage from './pages/Review';
+import DocumentPage from './pages/Document';
 
-function App() {
-  const [count, setCount] = useState(0)
+const NAV = [
+  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/upload', label: 'Upload', icon: Upload },
+  { path: '/actions', label: 'All Actions', icon: ListChecks },
+];
 
+function Sidebar() {
+  const { pathname } = useLocation();
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <aside className="w-64 min-h-screen bg-slate-900 text-white flex flex-col flex-shrink-0">
+      {/* Logo */}
+      <div className="px-6 py-5 border-b border-slate-800 flex items-center gap-3">
+        <div className="w-9 h-9 bg-blue-500 rounded-xl flex items-center justify-center">
+          <Scale className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+          <h1 className="text-base font-bold leading-tight">Nyaya-Setu</h1>
+          <p className="text-[10px] text-slate-400 uppercase tracking-widest">Compliance Engine</p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </div>
 
-      <div className="ticks"></div>
+      {/* Nav */}
+      <nav className="flex-1 p-4 space-y-1">
+        {NAV.map(({ path, label, icon: Icon }) => {
+          const active = pathname === path;
+          return (
+            <Link
+              key={path}
+              to={path}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                active
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      {/* Footer */}
+      <div className="p-4 border-t border-slate-800">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800">
+          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">NS</div>
+          <div>
+            <p className="text-sm font-semibold">Legal Officer</p>
+            <p className="text-xs text-slate-400">Government of Karnataka</p>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      </div>
+    </aside>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <Router>
+      <div className="flex min-h-screen bg-slate-50">
+        <Sidebar />
+        <main className="flex-1 overflow-auto">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/actions" element={<Dashboard showAll />} />
+            <Route path="/document/:docId" element={<DocumentPage />} />
+            <Route path="/review/:docId" element={<ReviewPage />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  );
+}

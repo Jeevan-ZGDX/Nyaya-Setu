@@ -1,142 +1,200 @@
-import React from 'react';
-import { 
-  TrendingUp, 
-  AlertCircle, 
-  CheckCircle2, 
-  Clock, 
-  Search, 
-  Filter, 
-  Download, 
-  ChevronRight,
-  ShieldAlert,
-  Users
-} from 'lucide-react';
+/**
+ * Dashboard.jsx — GET /actions with live filtering by status/dept/priority
+ */
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  AlertCircle, CheckCircle2, Clock, Shield,
+  ChevronRight, RefreshCw, SlidersHorizontal, Loader2
+} from 'lucide-react';
+import { getActions } from '../api';
+
+const PRIORITY_COLOR = {
+  High:   'bg-red-100 text-red-700',
+  Medium: 'bg-amber-100 text-amber-700',
+  Low:    'bg-slate-100 text-slate-600',
+};
+const STATUS_COLOR = {
+  PENDING:  'bg-amber-50 text-amber-700 border border-amber-200',
+  APPROVED: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  REJECTED: 'bg-red-50 text-red-600 border border-red-200',
+};
+
+function StatCard({ title, value, icon, color }) {
+  return (
+    <div className="card p-6 flex items-center gap-5">
+      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${color}`}>
+        {icon}
+      </div>
+      <div>
+        <p className="text-slate-500 text-sm font-medium">{title}</p>
+        <p className="text-3xl font-extrabold text-slate-900">{value ?? '—'}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
-  const stats = [
-    { title: 'Total Cases', value: '1,248', change: '+15%', icon: <TrendingUp className="w-5 h-5" />, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { title: 'Pending Compliance', value: '187', change: '86 new', icon: <Clock className="w-5 h-5" />, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { title: 'High Priority', value: '45', change: '12 critical', icon: <AlertCircle className="w-5 h-5" />, color: 'text-red-600', bg: 'bg-red-50' },
-    { title: 'Contempt Risk', value: '42', change: 'Moderate', icon: <ShieldAlert className="w-5 h-5" />, color: 'text-purple-600', bg: 'bg-purple-50' },
-  ];
+  const [actions, setActions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filters, setFilters] = useState({ status: '', priority: '', department: '' });
 
-  const actions = [
-    { id: 'NS-2023-4512', action: 'File Compliance Report: WP 1102/2023', dept: 'Revenue', deadline: '28 Oct 2023', sub: '(Due Tomorrow)', priority: 'Critical', pColor: 'bg-red-100 text-red-700' },
-    { id: 'NS-2023-4513', action: 'Submit status report on lake encroachment', dept: 'BBMP', deadline: '02 Nov 2023', sub: '(Soon)', priority: 'High', pColor: 'bg-amber-100 text-amber-700' },
-    { id: 'NS-2023-4514', action: 'Process pension arrears for Petitioner', dept: 'Finance', deadline: '02 Nov 2023', sub: '(Soon)', priority: 'Medium', pColor: 'bg-blue-100 text-blue-700' },
-    { id: 'NS-2023-4515', action: 'Formulate committee for waste management', dept: 'BBMP', deadline: '05 Nov 2023', sub: '(Soon)', priority: 'Critical', pColor: 'bg-red-100 text-red-700' },
-    { id: 'NS-2023-4516', action: 'Clear pending dues to the petitioner', dept: 'Revenue', deadline: '10 Nov 2023', sub: '(Scheduled)', priority: 'Medium', pColor: 'bg-blue-100 text-blue-700' },
-  ];
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await getActions(filters);
+      setActions(res.data.actions || []);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const counts = {
+    total: actions.length,
+    pending: actions.filter(a => a.status === 'PENDING').length,
+    approved: actions.filter(a => a.status === 'APPROVED').length,
+    high: actions.filter(a => a.priority === 'High').length,
+  };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="page">
+      {/* Header */}
+      <div className="page-header">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Overview</h1>
-          <p className="text-slate-500 mt-1">Cognitive Compliance Engine Dashboard</p>
+          <h1 className="text-3xl font-extrabold text-slate-900">Compliance Dashboard</h1>
+          <p className="text-slate-500 mt-1">Real-time view of AI-extracted judicial directives</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search reference..." 
-              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all w-64 shadow-sm"
-            />
-          </div>
-          <button className="p-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
-            <Filter className="w-4 h-4 text-slate-600" />
-          </button>
-          <button className="p-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-sm">
-            <Download className="w-4 h-4 text-slate-600" />
+        <div className="flex gap-3">
+          <Link to="/upload" className="btn-primary">+ Upload Judgment</Link>
+          <button onClick={load} className="btn-ghost flex items-center gap-2">
+            <RefreshCw className="w-4 h-4" /> Refresh
           </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, i) => (
-          <div key={i} className="premium-card p-6 flex flex-col gap-4 group">
-            <div className="flex justify-between items-start">
-              <div className={`p-3 rounded-xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110 duration-300`}>
-                {stat.icon}
-              </div>
-              <span className={`text-xs font-semibold px-2 py-1 rounded-md bg-slate-50 text-slate-500`}>
-                {stat.change}
-              </span>
-            </div>
-            <div>
-              <p className="text-slate-500 text-sm font-medium">{stat.title}</p>
-              <h3 className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</h3>
-            </div>
-            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-              <div className={`h-full ${stat.color.replace('text', 'bg')} opacity-60 w-2/3`}></div>
-            </div>
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <StatCard title="Total Actions" value={counts.total} color="bg-blue-50" icon={<Shield className="w-6 h-6 text-blue-600" />} />
+        <StatCard title="Pending" value={counts.pending} color="bg-amber-50" icon={<Clock className="w-6 h-6 text-amber-600" />} />
+        <StatCard title="Approved" value={counts.approved} color="bg-emerald-50" icon={<CheckCircle2 className="w-6 h-6 text-emerald-600" />} />
+        <StatCard title="High Priority" value={counts.high} color="bg-red-50" icon={<AlertCircle className="w-6 h-6 text-red-600" />} />
+      </div>
+
+      {/* Filters */}
+      <div className="card p-4 flex flex-wrap items-center gap-4">
+        <SlidersHorizontal className="w-4 h-4 text-slate-400" />
+        {[
+          { key: 'status', label: 'Status', opts: ['', 'PENDING', 'APPROVED', 'REJECTED'] },
+          { key: 'priority', label: 'Priority', opts: ['', 'High', 'Medium', 'Low'] },
+        ].map(({ key, label, opts }) => (
+          <div key={key} className="flex items-center gap-2">
+            <label className="text-xs font-bold text-slate-400 uppercase">{label}</label>
+            <select
+              value={filters[key]}
+              onChange={e => setFilters(f => ({ ...f, [key]: e.target.value }))}
+              className="input w-36 py-1.5"
+            >
+              {opts.map(o => <option key={o} value={o}>{o || `All ${label}s`}</option>)}
+            </select>
           </div>
         ))}
+        <input
+          placeholder="Filter department…"
+          value={filters.department}
+          onChange={e => setFilters(f => ({ ...f, department: e.target.value }))}
+          className="input w-52 py-1.5"
+        />
+        {(filters.status || filters.priority || filters.department) && (
+          <button onClick={() => setFilters({ status: '', priority: '', department: '' })}
+            className="text-xs text-blue-600 font-semibold hover:underline">
+            Clear filters
+          </button>
+        )}
       </div>
 
-      {/* Action Plans Table */}
-      <div className="premium-card overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-800">Action Plans</h2>
-          <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
-            View all <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-50/50 text-slate-500 text-xs uppercase font-bold tracking-wider">
-                <th className="px-6 py-4">Case Reference</th>
-                <th className="px-6 py-4">Required Action</th>
-                <th className="px-6 py-4">Assigned Dept</th>
-                <th className="px-6 py-4">Deadline</th>
-                <th className="px-6 py-4">Priority</th>
-                <th className="px-6 py-4"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {actions.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                  <td className="px-6 py-4 text-sm font-bold text-slate-700">#{item.id}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600 max-w-xs">{item.action}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
-                        {item.dept[0]}
-                      </div>
-                      <span className="font-medium text-slate-700">{item.dept}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-slate-900">{item.deadline}</span>
-                      <span className={`text-[10px] font-bold uppercase ${item.sub.includes('Tomorrow') ? 'text-red-500' : 'text-amber-500'}`}>
-                        {item.sub}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${item.pColor}`}>
-                      {item.priority}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link 
-                      to={`/document/${item.id}`} 
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </Link>
-                  </td>
+      {/* Table */}
+      <div className="card overflow-hidden">
+        {loading ? (
+          <div className="flex flex-col gap-3 p-6">
+            {[...Array(5)].map((_, i) => <div key={i} className="h-12 skeleton rounded-xl" />)}
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center">
+            <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+            <p className="text-red-600 font-medium">{error}</p>
+            <p className="text-slate-400 text-sm mt-1">Is the backend running on port 8000?</p>
+          </div>
+        ) : actions.length === 0 ? (
+          <div className="p-16 text-center text-slate-400">
+            <Shield className="w-12 h-12 mx-auto mb-4 opacity-30" />
+            <p className="font-medium">No actions found.</p>
+            <p className="text-sm mt-1">Upload a judgment to generate compliance actions.</p>
+            <Link to="/upload" className="btn-primary mt-4 inline-block">Upload PDF</Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50 text-xs text-slate-500 uppercase font-bold tracking-wider border-b border-slate-200">
+                <tr>
+                  <th className="px-6 py-4">Action</th>
+                  <th className="px-6 py-4">Department</th>
+                  <th className="px-6 py-4">Deadline</th>
+                  <th className="px-6 py-4">Priority</th>
+                  <th className="px-6 py-4">Confidence</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {actions.map(a => (
+                  <tr key={a.id} className="hover:bg-slate-50 transition-colors group">
+                    <td className="px-6 py-4 max-w-xs">
+                      <p className="font-medium text-slate-800 truncate">{a.description}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{a.action_type}</p>
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">{a.department}</td>
+                    <td className="px-6 py-4">
+                      <span className={`font-medium ${a.deadline?.toLowerCase().startsWith('inferred') ? 'text-amber-600' : 'text-slate-800'}`}>
+                        {a.deadline}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`badge ${PRIORITY_COLOR[a.priority] || 'bg-slate-100 text-slate-600'}`}>{a.priority}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-500 rounded-full"
+                            style={{ width: `${(a.confidence * 100).toFixed(0)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-slate-500">{(a.confidence * 100).toFixed(0)}%</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`badge ${STATUS_COLOR[a.status] || ''}`}>{a.status}</span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Link
+                        to={`/review/${a.document_id}`}
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

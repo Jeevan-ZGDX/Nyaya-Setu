@@ -1,149 +1,156 @@
-import React, { useState } from 'react';
-import { 
-  UploadCloud, 
-  FileText, 
-  CheckCircle2, 
-  AlertCircle, 
-  X,
-  FileCheck,
-  Zap
-} from 'lucide-react';
+/**
+ * Upload.jsx — POST /upload → POST /process/{doc_id} → redirect to /review/{doc_id}
+ */
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UploadCloud, FileText, X, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { uploadPDF, processDocument } from '../api';
+
+const STAGES = ['Uploading file…', 'Extracting text (OCR)…', 'Analysing with AI…', 'Generating action plan…'];
 
 export default function Upload() {
-  const [isDragging, setIsDragging] = useState(false);
-  const [file, setFile] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
+  const [file, setFile] = useState(null);
+  const [dragging, setDragging] = useState(false);
+  const [stage, setStage] = useState(-1); // -1 = idle
+  const [error, setError] = useState('');
 
-  const handleDrop = (e) => {
+  const pickFile = (f) => {
+    if (!f?.name.toLowerCase().endsWith('.pdf')) {
+      setError('Only PDF files are supported.');
+      return;
+    }
+    setError('');
+    setFile(f);
+  };
+
+  const handleDrop = useCallback((e) => {
     e.preventDefault();
-    setIsDragging(false);
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile?.type === 'application/pdf') {
-      setFile(droppedFile);
+    setDragging(false);
+    pickFile(e.dataTransfer.files[0]);
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!file) return;
+    setError('');
+    try {
+      // Stage 0: upload
+      setStage(0);
+      const uploadRes = await uploadPDF(file);
+      const docId = uploadRes.data.doc_id;
+
+      // Stage 1-3: process (one network call, stages are cosmetic)
+      setStage(1);
+      await new Promise(r => setTimeout(r, 600));
+      setStage(2);
+      const processRes = await processDocument(docId);
+      setStage(3);
+      await new Promise(r => setTimeout(r, 500));
+
+      navigate(`/review/${docId}`);
+    } catch (err) {
+      setError(err.message);
+      setStage(-1);
     }
   };
 
-  const handleUpload = () => {
-    setIsUploading(true);
-    let p = 0;
-    const interval = setInterval(() => {
-      p += 5;
-      setProgress(p);
-      if (p >= 100) {
-        clearInterval(interval);
-        setTimeout(() => navigate('/document/123'), 500);
-      }
-    }, 100);
-  };
+  const busy = stage >= 0;
 
   return (
-    <div className="max-w-4xl mx-auto py-12 space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-      <div className="text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
-          <Zap className="w-3.5 h-3.5 fill-blue-600" /> Powered by GPT-4o
-        </div>
-        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Ingest Judgment</h1>
-        <p className="text-lg text-slate-500 max-w-2xl mx-auto">Upload scanned or digital PDFs for cognitive legal extraction, intent classification, and action mapping.</p>
-      </div>
-
-      <div 
-        className={`relative group premium-card p-1 text-center transition-all duration-500 ${
-          isDragging ? 'ring-4 ring-blue-500/20 border-blue-500 bg-blue-50/50' : 'hover:border-slate-300'
-        }`}
-        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-      >
-        <div className={`m-4 border-2 border-dashed rounded-xl py-20 px-12 transition-all ${
-          isDragging ? 'border-blue-400 bg-white' : 'border-slate-200'
-        }`}>
-          <div className="relative mx-auto w-24 h-24 mb-6">
-            <div className={`absolute inset-0 bg-blue-100 rounded-3xl rotate-6 transition-transform group-hover:rotate-12 duration-500 ${isDragging ? 'scale-110' : ''}`}></div>
-            <div className={`absolute inset-0 bg-blue-600 rounded-3xl -rotate-6 transition-transform group-hover:-rotate-12 duration-500 flex items-center justify-center ${isDragging ? 'scale-110' : ''}`}>
-              <UploadCloud className="w-10 h-10 text-white" />
-            </div>
-          </div>
-          
-          <h3 className="text-xl font-bold text-slate-800">Drag & drop legal PDF</h3>
-          <p className="text-slate-500 mt-2 text-sm">Max file size: 50MB. Scanned and Digital PDFs supported.</p>
-          
-          <div className="mt-8">
-            <label className="cursor-pointer inline-flex items-center gap-2 px-8 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-all">
-              Browse Local Files
-              <input 
-                type="file" 
-                className="hidden" 
-                accept=".pdf"
-                onChange={(e) => setFile(e.target.files[0])}
-              />
-            </label>
-          </div>
+    <div className="page">
+      <div className="page-header">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900">Upload Judgment</h1>
+          <p className="text-slate-500 mt-1">Upload a PDF court judgment for AI-powered compliance extraction.</p>
         </div>
       </div>
 
-      {file && (
-        <div className="premium-card p-6 flex flex-col gap-6 animate-in slide-in-from-top-4 duration-500">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100">
-                <FileText className="w-7 h-7 text-blue-600" />
-              </div>
-              <div>
-                <p className="font-bold text-slate-900">{file.name}</p>
-                <p className="text-xs font-semibold text-slate-400 uppercase">{(file.size / 1024 / 1024).toFixed(2)} MB • READY TO PROCESS</p>
-              </div>
+      <div className="max-w-2xl">
+        {/* Drop zone */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleDrop}
+          className={`card p-10 text-center border-2 border-dashed transition-all duration-200 ${
+            dragging ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'
+          } ${busy ? 'pointer-events-none opacity-60' : 'cursor-pointer'}`}
+          onClick={() => !busy && document.getElementById('pdf-input').click()}
+        >
+          <input
+            id="pdf-input"
+            type="file"
+            accept=".pdf"
+            className="hidden"
+            onChange={(e) => pickFile(e.target.files[0])}
+          />
+          <div className="flex flex-col items-center gap-4">
+            <div className={`w-20 h-20 rounded-3xl flex items-center justify-center transition-colors ${
+              dragging ? 'bg-blue-600' : 'bg-slate-100'
+            }`}>
+              <UploadCloud className={`w-10 h-10 ${dragging ? 'text-white' : 'text-slate-400'}`} />
             </div>
-            {!isUploading && (
-              <button onClick={() => setFile(null)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-lg transition-colors">
-                <X className="w-5 h-5" />
-              </button>
-            )}
+            <div>
+              <p className="text-lg font-bold text-slate-800">Drag & drop your PDF</p>
+              <p className="text-sm text-slate-400 mt-1">or click to browse — scanned and digital PDFs supported</p>
+            </div>
           </div>
+        </div>
 
-          {isUploading ? (
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                <span className="text-blue-600 flex items-center gap-2">
-                   <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
-                   {progress < 40 ? 'Extracting Text...' : progress < 80 ? 'Analyzing Intent...' : 'Generating Action Plan...'}
-                </span>
-                <span className="text-slate-400">{progress}%</span>
-              </div>
-              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-blue-600 transition-all duration-300 ease-out shadow-[0_0_10px_rgba(37,99,235,0.5)]" 
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
+        {/* Selected file */}
+        {file && !busy && (
+          <div className="card p-4 mt-4 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+              <FileText className="w-6 h-6 text-blue-600" />
             </div>
-          ) : (
-            <button 
-              onClick={handleUpload}
-              className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 group"
-            >
-              <FileCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              Analyze Document
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-slate-900 truncate">{file.name}</p>
+              <p className="text-xs text-slate-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            </div>
+            <button onClick={() => setFile(null)} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
+              <X className="w-4 h-4 text-slate-400" />
             </button>
-          )}
-        </div>
-      )}
-
-      {/* Integration Info */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
-        {[
-          { title: 'OCR Processing', desc: 'Automatic deskewing and noise removal for scanned judgment copies.', icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" /> },
-          { title: 'Intent Classification', desc: 'Categorizes directives into Mandatory, Advisory, or Conditional.', icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" /> },
-          { title: 'Full Traceability', desc: 'Every extracted task maps back to the specific paragraph in source PDF.', icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" /> },
-        ].map((item, i) => (
-          <div key={i} className="flex flex-col gap-3 p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
-            {item.icon}
-            <h4 className="font-bold text-slate-800">{item.title}</h4>
-            <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
           </div>
-        ))}
+        )}
+
+        {/* Progress stages */}
+        {busy && (
+          <div className="card p-6 mt-4 space-y-5">
+            {STAGES.map((s, i) => {
+              const done = i < stage;
+              const active = i === stage;
+              return (
+                <div key={i} className="flex items-center gap-4">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    done ? 'bg-emerald-500' : active ? 'bg-blue-600' : 'bg-slate-100'
+                  }`}>
+                    {done
+                      ? <CheckCircle2 className="w-4 h-4 text-white" />
+                      : active
+                        ? <Loader2 className="w-4 h-4 text-white animate-spin" />
+                        : <span className="text-xs text-slate-400 font-bold">{i + 1}</span>
+                    }
+                  </div>
+                  <p className={`text-sm font-medium ${done ? 'text-emerald-600' : active ? 'text-blue-700' : 'text-slate-400'}`}>{s}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="mt-4 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        {/* Submit */}
+        {file && !busy && (
+          <button onClick={handleSubmit} className="btn-primary mt-6 w-full py-3 text-base">
+            Analyse Document →
+          </button>
+        )}
       </div>
     </div>
   );
