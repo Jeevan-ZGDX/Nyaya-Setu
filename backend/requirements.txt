@@ -1,9 +1,7 @@
 fastapi
-uvicorn
-pydantic
-sqlalchemy
-psycopg2-binary
-pdfplumber
-langchain
-openai
+uvicorn[standard]
 python-multipart
+sqlalchemy
+pdfplumber
+openai
+python-dotenv
