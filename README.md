@@ -146,7 +146,7 @@ Every output includes:
 ```bash
 cd backend
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### 💻 Frontend
@@ -160,8 +160,10 @@ npm run dev
 Create a `.env` file with:
 ```env
 OPENAI_API_KEY=your_key
-DATABASE_URL=postgresql://user:password@localhost/db
+DATABASE_URL=sqlite:///./nyayasetu.db
 ```
+
+Or use `.env.example` as a template.
 
 ---
 
@@ -174,12 +176,13 @@ DATABASE_URL=postgresql://user:password@localhost/db
 ---
 
 ## 🌟 Why This is Unique
-| Existing Systems | Nyaya-Setu |
-| :--- | :--- |
-| Store PDFs | Understand intent |
-| Manual reading | Automated reasoning |
-| No decision support | AI-generated actions |
-| No accountability | Full audit tracking |
+
+| Existing Systems     | Nyaya-Setu              |
+|---------------------|------------------------|
+| Store PDFs          | Understand intent      |
+| Manual reading      | Automated reasoning    |
+| No decision support | AI-generated actions   |
+| No accountability   | Full audit tracking    |
 
 ---
 
@@ -208,6 +211,12 @@ MIT License
 ---
 
 ## 🏁 Final Thought
-Nyaya-Setu is not just automation. It is a step toward **intelligent, accountable, AI-assisted governance.**
 
-⭐ Support: If you like this project, consider giving it a ⭐ on GitHub!
+> Nyaya-Setu is not just automation.  
+> It is a step toward **intelligent, accountable, AI-assisted governance**.
+
+---
+
+## ⭐ Support
+
+If you like this project, consider giving it a ⭐ on GitHub!
