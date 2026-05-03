@@ -176,12 +176,13 @@ Or use `.env.example` as a template.
 ---
 
 ## 🌟 Why This is Unique
-| Existing Systems | Nyaya-Setu |
-| :--- | :--- |
-| Store PDFs | Understand intent |
-| Manual reading | Automated reasoning |
-| No decision support | AI-generated actions |
-| No accountability | Full audit tracking |
+
+| Existing Systems     | Nyaya-Setu              |
+|---------------------|------------------------|
+| Store PDFs          | Understand intent      |
+| Manual reading      | Automated reasoning    |
+| No decision support | AI-generated actions   |
+| No accountability   | Full audit tracking    |
 
 ---
 
@@ -210,6 +211,12 @@ MIT License
 ---
 
 ## 🏁 Final Thought
-Nyaya-Setu is not just automation. It is a step toward **intelligent, accountable, AI-assisted governance.**
 
-⭐ Support: If you like this project, consider giving it a ⭐ on GitHub!
+> Nyaya-Setu is not just automation.  
+> It is a step toward **intelligent, accountable, AI-assisted governance**.
+
+---
+
+## ⭐ Support
+
+If you like this project, consider giving it a ⭐ on GitHub!
