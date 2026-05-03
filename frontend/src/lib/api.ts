@@ -1,11 +1,11 @@
 /**
  * api.ts — Centralized API client for Nyaya-Setu backend
- * All routes map to: http://localhost:8000
+ * All routes map to: http://localhost:8002
  */
 
 import axios from 'axios';
 
-const BASE_URL = "http://localhost:8001";
+const BASE_URL = "http://localhost:8002";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -89,6 +89,24 @@ export interface ActionsResponse {
 export interface VerifyActionRequest {
   decision: 'APPROVE' | 'REJECT';
   notes?: string;
+}
+
+export interface VerifyActionResponse {
+  status: string;
+  message: string;
+  data: {
+    action_id: string;
+    description: string;
+    decision: string;
+    department: string;
+    deadline: string;
+  };
+}
+
+export interface VerifyActionResponse {
+  status: string;
+  message?: string;
+  action?: Action; 
 }
 
 export interface DocumentsResponse {
