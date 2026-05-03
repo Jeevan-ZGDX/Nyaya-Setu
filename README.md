@@ -146,7 +146,7 @@ Every output includes:
 ```bash
 cd backend
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### 💻 Frontend
@@ -160,8 +160,10 @@ npm run dev
 Create a `.env` file with:
 ```env
 OPENAI_API_KEY=your_key
-DATABASE_URL=postgresql://user:password@localhost/db
+DATABASE_URL=sqlite:///./nyayasetu.db
 ```
+
+Or use `.env.example` as a template.
 
 ---
 

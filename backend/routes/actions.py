@@ -36,7 +36,7 @@ def get_all_actions(
     if department:
         query = query.filter(Action.department.ilike(f"%{department}%"))
     if priority:
-        query = query.filter(Action.priority == priority)
+        query = query.filter(Action.priority.ilike(f"%{priority}%"))
 
     actions = query.order_by(Action.created_at.desc()).all()
 

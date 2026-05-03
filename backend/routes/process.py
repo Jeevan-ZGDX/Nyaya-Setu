@@ -2,6 +2,7 @@
 routes/process.py - Document processing and retrieval endpoints
 POST /process/{doc_id}
 GET  /document/{doc_id}
+GET  /documents
 """
 
 import json
@@ -54,6 +55,32 @@ async def trigger_processing(doc_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
 
 
+@router.get("/documents", response_model=APIResponse)
+def get_all_documents(db: Session = Depends(get_db)):
+    """
+    Retrieve all documents for the processing feed.
+    """
+    documents = db.query(Document).order_by(Document.created_at.desc()).all()
+
+    return APIResponse(
+        status="success",
+        message=f"{len(documents)} document(s) retrieved",
+        data={
+            "total": len(documents),
+            "documents": [
+                {
+                    "id": d.id,
+                    "filename": d.filename,
+                    "status": d.status,
+                    "created_at": d.created_at.isoformat(),
+                    "actions_count": db.query(Action).filter(Action.document_id == d.id).count()
+                }
+                for d in documents
+            ]
+        }
+    )
+
+
 @router.get("/document/{doc_id}", response_model=APIResponse)
 def get_document(doc_id: str, db: Session = Depends(get_db)):
     """
@@ -97,3 +124,4 @@ def get_document(doc_id: str, db: Session = Depends(get_db)):
             ]
         }
     )
+
